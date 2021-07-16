@@ -1,0 +1,1 @@
+gcloud builds submit --tag gcr.io/brave-smile-298908/bagapi

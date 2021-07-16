@@ -1,0 +1,18 @@
+{
+    "include": [
+        "src/**/*", "typing/**/*",
+    ],
+    "allowJs": true,
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "target": "es5",
+        "outDir": "output",
+        "esModuleInterop": true,
+        "lib": [
+            "es5",
+            "es6"
+        ], 
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+    }
+}
