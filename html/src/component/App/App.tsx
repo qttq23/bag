@@ -7,6 +7,17 @@ import { TodoDb, TodoDbHelper } from '../../db/TodoDb';
 import { HomePage } from './HomePage';
 import { LoginPage } from './LoginPage';
 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams
+} from "react-router-dom";
+// import { AuthMdw } from './Middleware/AuthMdw';
+
+
 export type myfunc = (age: number) => number;
 
 type MyProps = {
@@ -44,8 +55,23 @@ export class App extends React.Component<MyProps, MyState> {
   render() {
     return (
 
+      <div className="App" style={{ backgroundColor: '' }}>
+        {/* <Router>
+          <div>
 
-      <div className="App" style={{backgroundColor: ''}}>
+            <Switch>
+              <Route path="/login">
+                <LoginPage onDoneSignIn={this.handleToken} />
+              </Route>
+              <Route path="/home">
+                <HomePage onSignOut={this.handleSignOut} />
+              </Route>
+              <Route path="/">
+                <HomePage onSignOut={this.handleSignOut} />
+              </Route>
+            </Switch>
+          </div>
+        </Router> */}
         {
           this.state.isSignedIn ?
             <HomePage onSignOut={this.handleSignOut} />

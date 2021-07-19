@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import axios from 'axios';
 import { Section } from '../../../../model/Section';
 import { PaperApi } from '../../../../api/PaperApi';
@@ -18,7 +18,7 @@ type MyState = {
     // localSection: Section;
 };
 
-export class SectionPanel extends React.Component<MyProps, MyState> {
+class SectionPanelOld extends React.Component<MyProps, MyState> {
 
     // state: MyState = {
     //     localSection: null
@@ -79,10 +79,59 @@ export class SectionPanel extends React.Component<MyProps, MyState> {
                     <Button variant="secondary" onClick={this.handleCopyClick}>copy</Button>
 
                 </div>
-                <br/>
+                <br />
             </div >
         );
     }
 
 }
+
+export const SectionPanel = (props: MyProps) => {
+
+    let section = props.section;
+    let refText = useRef<HTMLTextAreaElement>(null);
+
+    let handleInputChange = (event: any) => {
+        let section = props.section;
+        section.content = event.target.value;
+        props.onSectionChange(section);
+    }
+
+    let handleSaveClick = (event: any) => {
+        let section = props.section;
+        props.onSectionSave(section);
+    }
+
+    let handleCopyClick = (event: any) => {
+        if (refText.current) {
+            let textArea = refText.current;
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);  /* For mobile devices */
+            document.execCommand("copy");
+        }
+
+    }
+
+    return (
+        <div >
+            <Form.Control
+                as="textarea"
+                placeholder="Leave a comment here"
+                style={{ height: '100px' }}
+
+                ref={refText}
+                value={section.content}
+                onChange={handleInputChange}
+            />
+
+            <div className="d-flex justify-content-center">
+                <Button variant="primary" onClick={handleSaveClick}>save2</Button>
+                       &emsp;
+                    <Button variant="secondary" onClick={handleCopyClick}>copy</Button>
+
+            </div>
+            <br />
+        </div >
+    );
+};
 
