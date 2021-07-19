@@ -5,7 +5,16 @@ import { Paper } from '../../../model/Paper';
 import { SectionPanel } from './SectionPanel';
 import { Section } from '../../../model/Section';
 import { FirebaseAPI } from '../../../fb';
+import Container from 'react-bootstrap/esm/Container';
+import Row from 'react-bootstrap/esm/Row';
+import Col from 'react-bootstrap/esm/Col';
+import Navbar from 'react-bootstrap/esm/Navbar';
+import Button from 'react-bootstrap/esm/Button';
 
+import { ProSidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import 'react-pro-sidebar/dist/css/styles.css';
+import { FaGem, FaHeart, FaUserAlt } from 'react-icons/fa';
+import { IoMenu } from "react-icons/io5";
 
 type MyProps = {
     // using `interface` is also ok
@@ -17,7 +26,9 @@ type MyState = {
     papers: Paper[];
     selectedPaper: Paper | null;
     statusMessage: string,
-    userEmail: string
+    userEmail: string,
+    isCollapse: boolean,
+    isToggled: boolean
 };
 
 export class HomePage extends React.Component<MyProps, MyState> {
@@ -26,7 +37,9 @@ export class HomePage extends React.Component<MyProps, MyState> {
         papers: [],
         selectedPaper: null,
         statusMessage: 'empty...',
-        userEmail: 'empty email...'
+        userEmail: 'empty email...',
+        isCollapse: false,
+        isToggled: true
     };
 
 
@@ -159,6 +172,7 @@ export class HomePage extends React.Component<MyProps, MyState> {
     }
 
     handleSignOut = async (event: any) => {
+
         let fb = new FirebaseAPI();
         await fb.signOut();
 
@@ -175,43 +189,161 @@ export class HomePage extends React.Component<MyProps, MyState> {
         if (statusMessage.startsWith('done')) {
             statusMessageElement = <p style={{ color: 'green', fontWeight: 'bold' }}>{statusMessage}</p>;
         }
+        let customNavBar = <Navbar bg="primary" variant="dark" expand="md" fixed={undefined}>
+            <Container style={{ backgroundColor: '' }} fluid>
+
+
+
+                <Navbar.Brand href="#home">
+                    <Button
+                        variant="dark"
+                        className="d-none d-md-inline"
+                        onClick={() => {
+                            this.setState({
+                                isCollapse: !this.state.isCollapse
+                            });
+
+                        }}>
+                        <IoMenu size={20} />
+
+                    </Button>
+
+                    <Button
+                        variant="light"
+                        className="d-inline d-md-none"
+                        onClick={() => {
+                            this.setState({
+                                isCollapse: false,
+                                isToggled: !this.state.isToggled
+                            });
+
+                        }}>
+                        <IoMenu size={20} />
+
+                    </Button>
+
+
+                                &emsp;
+                                Bag Homepage
+                            </Navbar.Brand>
+                <Navbar.Toggle children={
+                    <FaUserAlt />
+                } />
+                <Navbar.Collapse className="justify-content-end">
+                    <Navbar.Brand>
+                        {this.state.userEmail}
+                                &emsp;
+                                <Button variant="secondary"
+                            onClick={this.handleSignOut}
+                        >sign out</Button>
+
+                    </Navbar.Brand>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>;
+
 
         return (
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                margin: 'auto'
-            }} >
-                hoome page, user: {this.state.userEmail}
-                <button onClick={this.handleSignOut}>sign out</button>
-                <div>status: {statusMessageElement}</div>
-
-
-                <ul>
-                    {papers.map((paper) =>
-                        <li key={paper._id}>
-                            <button onClick={() => this.handlePaperClick(paper._id)}>{paper.name}</button>
-                        </li>
-                    )}
-                </ul>
-
-                <div>
-                    paper content
+            <div style={{ backgroundColor: '', height: '100%' }} className="d-flex flex-column">
+                <div className="d-none d-md-block ">
+                    {customNavBar}
                 </div>
-                <ul>
-                    {selectedPaper?.sections.map((section) =>
-                        <SectionPanel key={section._id}
-                            section={section}
-                            onSectionChange={this.handleSectionChange}
-                            onSectionSave={this.handleSectionSave}
-                        />
-                    )}
-                </ul>
-                {
-                    selectedPaper ?
-                        <button onClick={this.handleAddClick}>Add section</button>
-                        : ''
-                }
+
+
+                <div className="d-flex flex-row flex-fill" style={{ backgroundColor: '' }}>
+                    <div style={{ backgroundColor: '' }}>
+                        <ProSidebar
+                            collapsed={this.state.isCollapse}
+                            breakPoint="md"
+                            onToggle={() => {
+                                this.setState({
+                                    isToggled: !this.state.isToggled
+                                })
+                            }}
+                            toggled={this.state.isToggled}
+                        >
+                            <Menu iconShape="square">
+
+                                <MenuItem icon={<FaGem />}>Dashboard</MenuItem>
+
+                                <SubMenu title="Papers" icon={<FaHeart />} defaultOpen={true}>
+                                    {papers.map((paper) =>
+                                        <MenuItem key={paper._id} onClick={() => this.handlePaperClick(paper._id)}>
+                                            {paper.name}
+                                        </MenuItem>
+                                    )}
+                                </SubMenu>
+
+                                <SubMenu title="Items" icon={<FaHeart />} defaultOpen={true}>
+                                    <MenuItem>item 1</MenuItem>
+                                    <MenuItem>item 2</MenuItem>
+                                </SubMenu>
+                            </Menu>
+                        </ProSidebar>
+                    </div>
+                    <div className="flex-fill d-flex flex-column" style={{ backgroundColor: '' }} >
+
+                        <div className="d-block d-md-none">
+                            {customNavBar}
+                        </div>
+
+
+                        <Container style={{ backgroundColor: '' }} >
+
+                            <Row>
+
+
+                                <Col>
+
+
+
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        margin: 'auto'
+                                    }} >
+                                        {/* hoome page, user: {this.state.userEmail} */}
+                                        <div>status: {statusMessageElement}</div>
+
+
+
+
+                                        <div>
+                                            {selectedPaper?.sections.map((section) =>
+                                                <SectionPanel key={section._id}
+                                                    section={section}
+                                                    onSectionChange={this.handleSectionChange}
+                                                    onSectionSave={this.handleSectionSave}
+                                                />
+                                            )}
+                                        </div>
+                                        <br />
+                                        {
+                                            selectedPaper ?
+                                                <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                                : ''
+                                        }
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
+                                    </div>
+
+                                </Col>
+                            </Row>
+                        </Container>
+
+
+
+
+                    </div>
+
+
+                </div>
             </div>
         );
     }

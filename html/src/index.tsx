@@ -5,9 +5,9 @@ import {App, myfunc} from './component/App/App';
 import { Car } from './model/car';
 import { FirebaseAPI } from './fb';
 
-let handler = (x:number)=>{
-  return 3*x;
-}
+// Importing the Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 
 // init firebase

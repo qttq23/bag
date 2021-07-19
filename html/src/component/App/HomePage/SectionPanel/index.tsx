@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { Section } from '../../../../model/Section';
 import { PaperApi } from '../../../../api/PaperApi';
+import Form from 'react-bootstrap/esm/Form';
+import Button from 'react-bootstrap/esm/Button';
 
 
 type MyProps = {
@@ -55,15 +57,30 @@ export class SectionPanel extends React.Component<MyProps, MyState> {
         let section = this.props.section;
 
         return (
-            <li key={section._id} >
-                <textarea
+            <div >
+                <Form.Control
+                    as="textarea"
+                    placeholder="Leave a comment here"
+                    style={{ height: '100px' }}
+
+                    ref={this.refText}
+                    value={section.content}
+                    onChange={this.handleInputChange}
+                />
+                {/* <textarea
                     ref={this.refText}
                     style={{ width: '100%', height: '100px' }}
                     value={section.content}
-                    onChange={this.handleInputChange}></textarea>
-                <button onClick={this.handleSaveClick}>save</button>
-                <button onClick={this.handleCopyClick}>copy</button>
-            </li >
+                    onChange={this.handleInputChange}></textarea> */}
+
+                <div className="d-flex justify-content-center">
+                    <Button variant="primary" onClick={this.handleSaveClick}>save</Button>
+                       &emsp;
+                    <Button variant="secondary" onClick={this.handleCopyClick}>copy</Button>
+
+                </div>
+                <br/>
+            </div >
         );
     }
 

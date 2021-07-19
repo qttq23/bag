@@ -2,6 +2,13 @@ import React from 'react';
 import axios from 'axios';
 import { FirebaseAPI } from '../../../fb';
 import { AuthApi } from '../../../api/AuthApi';
+import Button from 'react-bootstrap/esm/Button';
+import { FaGoogle } from "react-icons/fa";
+import Form from 'react-bootstrap/esm/Form';
+import Container from 'react-bootstrap/esm/Container';
+import Row from 'react-bootstrap/esm/Row';
+import Col from 'react-bootstrap/esm/Col';
+import Navbar from 'react-bootstrap/esm/Navbar';
 
 
 type MyProps = {
@@ -19,7 +26,7 @@ export class LoginPage extends React.Component<MyProps, MyState> {
 
     state: MyState = {
         count: 7,
-        statusMessage: 'empty'
+        statusMessage: '...'
     };
     refEmail = React.createRef<HTMLInputElement>();
     refPassword = React.createRef<HTMLInputElement>();
@@ -179,38 +186,63 @@ export class LoginPage extends React.Component<MyProps, MyState> {
 
         return (
             <div>
-                {
-                    isSignedIn === 'true' ?
-                        'waiting for auto sigin...'
-                        :
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            width: '300px',
-                            margin: 'auto'
-                        }} >
-                            this is sign in
-                            <form>
-                                <input type="text" ref={this.refEmail}></input>
-                                <input type="password" ref={this.refPassword}></input>
-                                <p>{this.state.statusMessage}</p>
-                                <br></br>
-                                <br></br>
-                                <button type="submit" onClick={this.handleSignIn}>sign in</button>
+                <Navbar bg="primary" variant="dark">
+                    <Container>
+                        <Navbar.Brand href="#home"><h4>Bag Sign In</h4></Navbar.Brand>
+                        <Navbar.Toggle />
+                     
+                    </Container>
+                </Navbar>
 
-                            </form>
-                            <br></br>
-                            <br></br>
-                            <button onClick={this.handleSignInGoogle}>sign in google</button>
-                            <br></br>
-                            <br></br>
-                            <button onClick={this.handleSignUp}>sign up</button>
+                <Container>
+                    <Row>
+                        <Col>
+                            {
+                                isSignedIn === 'true' ?
+                                    'waiting for auto sigin...'
+                                    :
+                                    <div  >
+                                        <Form>
+                                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                                <Form.Label>Email address</Form.Label>
+                                                <Form.Control type="email" placeholder="Enter email" ref={this.refEmail} />
 
-                        </div>
+                                            </Form.Group>
 
-                }
+                                            <Form.Group className="mb-3" controlId="formBasicPassword">
+                                                <Form.Label>Password</Form.Label>
+                                                <Form.Control type="password" placeholder="Password" ref={this.refPassword} />
+                                            </Form.Group>
+
+                                            <p>{this.state.statusMessage}</p>
+
+                                            <Button variant="primary" type="submit" onClick={this.handleSignIn}>sign in</Button>
+                                        </Form>
+                                        {/* 
+                                    <form>
+                                        <input type="text" ref={this.refEmail}></input>
+                                        <input type="password" ref={this.refPassword}></input>
+                                        <p>{this.state.statusMessage}</p>
+                                        <br></br>
+                                        <br></br>
+                                        <Button variant="primary" type="submit" onClick={this.handleSignIn}>sign in</Button>
+                                    </form> */}
+                                        <br></br>
+                                        <br></br>
+                                        <Button variant="outline-primary" onClick={this.handleSignUp}>sign up</Button>
+                                        <br></br>
+                                        <br></br>
+                                        <Button variant="light" onClick={this.handleSignInGoogle}><FaGoogle />&emsp;<span>sign in google</span></Button>
+
+                                    </div>
+
+                            }
+                        </Col>
+                    </Row>
+                </Container>
+
+
             </div>
-
 
         );
     }
