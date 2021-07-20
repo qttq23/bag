@@ -4,7 +4,7 @@ import { Section } from '../../../../model/Section';
 import { PaperApi } from '../../../../api/PaperApi';
 import Form from 'react-bootstrap/esm/Form';
 import Button from 'react-bootstrap/esm/Button';
-
+import { FiMaximize2 } from "react-icons/fi";
 
 type MyProps = {
     // using `interface` is also ok
@@ -18,78 +18,12 @@ type MyState = {
     // localSection: Section;
 };
 
-class SectionPanelOld extends React.Component<MyProps, MyState> {
-
-    // state: MyState = {
-    //     localSection: null
-    // };
-    refText = React.createRef<HTMLTextAreaElement>();
-
-
-
-    componentDidMount() {
-
-    }
-
-    handleInputChange = (event: any) => {
-        let section = this.props.section;
-        section.content = event.target.value;
-        this.props.onSectionChange(section);
-    }
-
-    handleSaveClick = (event: any) => {
-        let section = this.props.section;
-        this.props.onSectionSave(section);
-    }
-
-    handleCopyClick = (event: any) => {
-        if (this.refText.current) {
-            let textArea = this.refText.current;
-            textArea.select();
-            textArea.setSelectionRange(0, 99999);  /* For mobile devices */
-            document.execCommand("copy");
-        }
-
-    }
-
-    render() {
-
-        let section = this.props.section;
-
-        return (
-            <div >
-                <Form.Control
-                    as="textarea"
-                    placeholder="Leave a comment here"
-                    style={{ height: '100px' }}
-
-                    ref={this.refText}
-                    value={section.content}
-                    onChange={this.handleInputChange}
-                />
-                {/* <textarea
-                    ref={this.refText}
-                    style={{ width: '100%', height: '100px' }}
-                    value={section.content}
-                    onChange={this.handleInputChange}></textarea> */}
-
-                <div className="d-flex justify-content-center">
-                    <Button variant="primary" onClick={this.handleSaveClick}>save</Button>
-                       &emsp;
-                    <Button variant="secondary" onClick={this.handleCopyClick}>copy</Button>
-
-                </div>
-                <br />
-            </div >
-        );
-    }
-
-}
 
 export const SectionPanel = (props: MyProps) => {
 
     let section = props.section;
     let refText = useRef<HTMLTextAreaElement>(null);
+    let refDiv = useRef<HTMLDivElement>(null);
 
     let handleInputChange = (event: any) => {
         let section = props.section;
@@ -112,8 +46,43 @@ export const SectionPanel = (props: MyProps) => {
 
     }
 
+    let handleFullScreenClick = (event: any)=>{
+        if (!document.fullscreenElement) {
+            refDiv.current?.requestFullscreen();
+
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    // React.useEffect(() => {
+
+    //     function showFullScreen(event: MouseEvent) {
+    //         if (!document.fullscreenElement) {
+    //             refText.current?.requestFullscreen();
+
+    //         } else {
+    //             document.exitFullscreen();
+    //         }
+    //     }
+    //     function registerFullScreen() {
+    //         if (refText.current) {
+    //             refText.current.addEventListener('dblclick', showFullScreen);
+    //         }
+    //     }
+    //     function unRegisterFullScreen() {
+    //         if (refText.current) {
+    //             refText.current.removeEventListener('dblclick', showFullScreen);
+    //         }
+    //     }
+
+    //     registerFullScreen();
+    //     return unRegisterFullScreen;
+
+    // }, []);
+
     return (
-        <div >
+        <div ref={refDiv}>
             <Form.Control
                 as="textarea"
                 placeholder="Leave a comment here"
@@ -125,9 +94,13 @@ export const SectionPanel = (props: MyProps) => {
             />
 
             <div className="d-flex justify-content-center">
-                <Button variant="primary" onClick={handleSaveClick}>save2</Button>
+                <Button variant="primary" onClick={handleSaveClick}>save</Button>
                        &emsp;
-                    <Button variant="secondary" onClick={handleCopyClick}>copy</Button>
+                <Button variant="secondary" onClick={handleCopyClick}>copy</Button>
+                    &emsp;
+                <Button onClick={handleFullScreenClick}>
+                    <FiMaximize2 />
+                </Button>
 
             </div>
             <br />

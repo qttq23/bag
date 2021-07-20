@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { PaperApi } from '../../../api/PaperApi';
 import { Paper } from '../../../model/Paper';
-import { SectionPanel} from './SectionPanel';
+import { SectionPanel } from './SectionPanel';
 import { Section } from '../../../model/Section';
 import { FirebaseAPI } from '../../../fb';
 import Container from 'react-bootstrap/esm/Container';
@@ -31,325 +31,6 @@ type MyState = {
     isToggled: boolean
 };
 
-class HomePageOld extends React.Component<MyProps, MyState> {
-
-    state: MyState = {
-        papers: [],
-        selectedPaper: null,
-        statusMessage: 'empty...',
-        userEmail: 'empty email...',
-        isCollapse: false,
-        isToggled: true
-    };
-
-
-    componentDidMount() {
-
-        // get user's name
-        let fb = new FirebaseAPI();
-        fb.getUser().then(user => {
-            if (!user) return;
-
-            this.setState({
-                userEmail: user.email || 'email not found'
-            });
-
-            // get papers
-            this.getPapers();
-        });
-
-
-    }
-
-    async getPapers() {
-        this.setState({
-            statusMessage: 'getting papers...'
-        });
-
-        let api = new PaperApi();
-        let papers = await api.getListPaper(
-            await new FirebaseAPI().getIdToken());
-        console.log(papers);
-        this.setState({
-            papers: papers,
-            statusMessage: 'done papers'
-        });
-
-        this.getOnePaper(papers[0]._id);
-    }
-
-    async getOnePaper(paperId: string) {
-        this.setState({
-            statusMessage: 'getting one paper...'
-        });
-
-        let api = new PaperApi();
-        let paper = await api.getOnePaper(
-            await new FirebaseAPI().getIdToken(), paperId);
-        console.log(paper);
-        this.setState({
-            selectedPaper: paper,
-            statusMessage: 'done one paper'
-        });
-    }
-
-    async updateSection(paperId: string, section: Section) {
-        this.setState({
-            statusMessage: 'updating section...'
-        });
-
-        let api = new PaperApi();
-        let updatedSection = await api.updateSection(
-            await new FirebaseAPI().getIdToken(), paperId, section);
-        console.log(updatedSection);
-
-        //
-        let sections = this.state.selectedPaper?.sections || [];
-        for (let sec of sections) {
-            if (sec._id === updatedSection?._id) {
-                sec = updatedSection;
-            }
-        }
-        this.setState({
-            selectedPaper: this.state.selectedPaper,
-            statusMessage: 'done update section'
-        });
-    }
-
-    async addSection(paperId: string) {
-        this.setState({
-            statusMessage: 'adding section...'
-        });
-
-        let api = new PaperApi();
-        let newSection = await api.addSection(
-            await new FirebaseAPI().getIdToken(), paperId);
-        console.log(newSection);
-
-        let sections = this.state.selectedPaper?.sections || [];
-        if (newSection) {
-            sections.push(newSection);
-            this.setState({
-                selectedPaper: this.state.selectedPaper
-            });
-        }
-
-        this.setState({
-            statusMessage: 'done add section'
-        });
-    }
-
-    handlePaperClick = (paperId: string) => {
-        this.getOnePaper(paperId);
-    }
-
-    handleSectionChange = (section: Section) => {
-
-        let sections = this.state.selectedPaper?.sections || [];
-        for (let sec of sections) {
-            if (sec._id === section._id) {
-                sec.content = section.content;
-                break;
-            }
-        }
-
-        this.setState({
-            selectedPaper: this.state.selectedPaper
-        });
-    }
-
-    handleSectionSave = (section: Section) => {
-        let paperId = this.state.selectedPaper?._id;
-        if (!paperId) return;
-
-        this.updateSection(paperId, section);
-    }
-
-    handleAddClick = (event: any) => {
-        if (this.state.selectedPaper) {
-
-            this.addSection(this.state.selectedPaper._id);
-        }
-    }
-
-    handleSignOut = async (event: any) => {
-
-        let fb = new FirebaseAPI();
-        await fb.signOut();
-
-        localStorage.setItem('isSignedIn', 'false');
-        this.props.onSignOut();
-    }
-
-    render() {
-
-        let papers = this.state.papers;
-        let selectedPaper = this.state.selectedPaper;
-        let statusMessage = this.state.statusMessage;
-        let statusMessageElement = <p>{statusMessage}</p>;
-        if (statusMessage.startsWith('done')) {
-            statusMessageElement = <p style={{ color: 'green', fontWeight: 'bold' }}>{statusMessage}</p>;
-        }
-        let customNavBar = <Navbar bg="primary" variant="dark" expand="md" fixed={undefined}>
-            <Container style={{ backgroundColor: '' }} fluid>
-
-
-
-                <Navbar.Brand href="#home">
-                    <Button
-                        variant="dark"
-                        className="d-none d-md-inline"
-                        onClick={() => {
-                            this.setState({
-                                isCollapse: !this.state.isCollapse
-                            });
-
-                        }}>
-                        <IoMenu size={20} />
-
-                    </Button>
-
-                    <Button
-                        variant="light"
-                        className="d-inline d-md-none"
-                        onClick={() => {
-                            this.setState({
-                                isCollapse: false,
-                                isToggled: !this.state.isToggled
-                            });
-
-                        }}>
-                        <IoMenu size={20} />
-
-                    </Button>
-
-
-                                &emsp;
-                                Bag Homepage
-                            </Navbar.Brand>
-                <Navbar.Toggle children={
-                    <FaUserAlt />
-                } />
-                <Navbar.Collapse className="justify-content-end">
-                    <Navbar.Brand>
-                        {this.state.userEmail}
-                                &emsp;
-                                <Button variant="secondary"
-                            onClick={this.handleSignOut}
-                        >sign out</Button>
-
-                    </Navbar.Brand>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>;
-
-
-        return (
-            <div style={{ backgroundColor: '', height: '100%' }} className="d-flex flex-column">
-                <div className="d-none d-md-block ">
-                    {customNavBar}
-                </div>
-
-
-                <div className="d-flex flex-row flex-fill" style={{ backgroundColor: '' }}>
-                    <div style={{ backgroundColor: '' }}>
-                        <ProSidebar
-                            collapsed={this.state.isCollapse}
-                            breakPoint="md"
-                            onToggle={() => {
-                                this.setState({
-                                    isToggled: !this.state.isToggled
-                                })
-                            }}
-                            toggled={this.state.isToggled}
-                        >
-                            <Menu iconShape="square">
-
-                                <MenuItem icon={<FaGem />}>Dashboard</MenuItem>
-
-                                <SubMenu title="Papers" icon={<FaHeart />} defaultOpen={true}>
-                                    {papers.map((paper) =>
-                                        <MenuItem key={paper._id} onClick={() => this.handlePaperClick(paper._id)}>
-                                            {paper.name}
-                                        </MenuItem>
-                                    )}
-                                </SubMenu>
-
-                                <SubMenu title="Items" icon={<FaHeart />} defaultOpen={true}>
-                                    <MenuItem>item 1</MenuItem>
-                                    <MenuItem>item 2</MenuItem>
-                                </SubMenu>
-                            </Menu>
-                        </ProSidebar>
-                    </div>
-                    <div className="flex-fill d-flex flex-column" style={{ backgroundColor: '' }} >
-
-                        <div className="d-block d-md-none">
-                            {customNavBar}
-                        </div>
-
-
-                        <Container style={{ backgroundColor: '' }} >
-
-                            <Row>
-
-
-                                <Col>
-
-
-
-                                    <div style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        margin: 'auto'
-                                    }} >
-                                        {/* hoome page, user: {this.state.userEmail} */}
-                                        <div>status: {statusMessageElement}</div>
-
-
-
-
-                                        <div>
-                                            {selectedPaper?.sections.map((section) =>
-                                                <SectionPanel key={section._id}
-                                                    section={section}
-                                                    onSectionChange={this.handleSectionChange}
-                                                    onSectionSave={this.handleSectionSave}
-                                                />
-                                            )}
-                                        </div>
-                                        <br />
-                                        {
-                                            selectedPaper ?
-                                                <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                                : ''
-                                        }
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                        <Button variant="outline-primary" onClick={this.handleAddClick}>Add section</Button>
-                                    </div>
-
-                                </Col>
-                            </Row>
-                        </Container>
-
-
-
-
-                    </div>
-
-
-                </div>
-            </div>
-        );
-    }
-
-}
 
 export const HomePage = (props: MyProps) => {
 
@@ -364,7 +45,7 @@ export const HomePage = (props: MyProps) => {
 
     async function getPapers() {
         state.statusMessage = 'getting papers...';
-        setState({...state});
+        setState({ ...state });
 
         let api = new PaperApi();
         let papers = await api.getListPaper(
@@ -373,14 +54,14 @@ export const HomePage = (props: MyProps) => {
 
         state.papers = papers;
         state.statusMessage = 'done papers';
-        setState({...state});
+        setState({ ...state });
 
         getOnePaper(papers[0]._id);
     }
 
     async function getOnePaper(paperId: string) {
         state.statusMessage = 'getting one paper...';
-        setState({...state});
+        setState({ ...state });
 
         let api = new PaperApi();
         let paper = await api.getOnePaper(
@@ -389,12 +70,12 @@ export const HomePage = (props: MyProps) => {
 
         state.selectedPaper = paper;
         state.statusMessage = 'done one paper';
-        setState({...state});
+        setState({ ...state });
     }
 
     async function updateSection(paperId: string, section: Section) {
         state.statusMessage = 'updating section...';
-        setState({...state});
+        setState({ ...state });
 
         let api = new PaperApi();
         let updatedSection = await api.updateSection(
@@ -410,12 +91,12 @@ export const HomePage = (props: MyProps) => {
         }
         state.selectedPaper = state.selectedPaper;
         state.statusMessage = 'done update section';
-        setState({...state});
+        setState({ ...state });
     }
 
     async function addSection(paperId: string) {
         state.statusMessage = 'adding section...';
-        setState({...state});
+        setState({ ...state });
 
         let api = new PaperApi();
         let newSection = await api.addSection(
@@ -426,11 +107,11 @@ export const HomePage = (props: MyProps) => {
         if (newSection) {
             sections.push(newSection);
             state.selectedPaper = state.selectedPaper;
-            setState({...state});
+            setState({ ...state });
         }
 
         state.statusMessage = 'done add section';
-        setState({...state});
+        setState({ ...state });
     }
 
     let handlePaperClick = (paperId: string) => {
@@ -448,7 +129,7 @@ export const HomePage = (props: MyProps) => {
         }
 
         state.selectedPaper = state.selectedPaper;
-        setState({...state});
+        setState({ ...state });
     }
 
     let handleSectionSave = (section: Section) => {
@@ -483,7 +164,7 @@ export const HomePage = (props: MyProps) => {
             if (!user) return;
 
             state.userEmail = user.email || 'email not found';
-            setState({...state});
+            setState({ ...state });
 
             // get papers
             getPapers();
@@ -510,7 +191,7 @@ export const HomePage = (props: MyProps) => {
                     className="d-none d-md-inline"
                     onClick={() => {
                         state.isCollapse = !state.isCollapse;
-                        setState({...state});
+                        setState({ ...state });
 
                     }}>
                     <IoMenu size={20} />
@@ -521,9 +202,9 @@ export const HomePage = (props: MyProps) => {
                     variant="light"
                     className="d-inline d-md-none"
                     onClick={() => {
-                        state.isCollapse =  false;
+                        state.isCollapse = false;
                         state.isToggled = !state.isToggled;
-                        setState({...state});
+                        setState({ ...state });
 
                     }}>
                     <IoMenu size={20} />
@@ -539,11 +220,19 @@ export const HomePage = (props: MyProps) => {
             } />
             <Navbar.Collapse className="justify-content-end">
                 <Navbar.Brand>
-                    {state.userEmail}
+                    <div className="d-flex flex-column flex-md-row">
+                        <div>
+
+                            {state.userEmail}
                                 &emsp;
-                                <Button variant="secondary"
-                        onClick={handleSignOut}
-                    >sign out</Button>
+                        </div>
+                        <div>
+                            <Button variant="secondary"
+                                onClick={handleSignOut}
+                            >sign out</Button>
+
+                        </div>
+                    </div>
 
                 </Navbar.Brand>
             </Navbar.Collapse>
@@ -565,7 +254,7 @@ export const HomePage = (props: MyProps) => {
                         breakPoint="md"
                         onToggle={() => {
                             state.isToggled = !state.isToggled;
-                            setState({...state});
+                            setState({ ...state });
                         }}
                         toggled={state.isToggled}
                     >
