@@ -467,10 +467,10 @@ export const HomePage = (props: MyProps) => {
 
     let handleSignOut = async (event: any) => {
 
-        let fb = new FirebaseAPI();
-        await fb.signOut();
+        // let fb = new FirebaseAPI();
+        // await fb.signOut();
 
-        localStorage.setItem('isSignedIn', 'false');
+        // localStorage.setItem('isSignedIn', 'false');
         props.onSignOut();
     }
 

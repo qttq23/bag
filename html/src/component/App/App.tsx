@@ -15,7 +15,8 @@ import {
   useRouteMatch,
   useParams
 } from "react-router-dom";
-// import { AuthMdw } from './Middleware/AuthMdw';
+import { LoginMdw } from './Middleware/LoginMdw';
+import { HomeMdw } from './Middleware/HomeMdw';
 
 
 export type myfunc = (age: number) => number;
@@ -56,27 +57,39 @@ export class App extends React.Component<MyProps, MyState> {
     return (
 
       <div className="App" style={{ backgroundColor: '' }}>
-        {/* <Router>
+        <Router>
           <div>
 
             <Switch>
+
               <Route path="/login">
-                <LoginPage onDoneSignIn={this.handleToken} />
+                <LoginMdw></LoginMdw>
               </Route>
+
+
               <Route path="/home">
-                <HomePage onSignOut={this.handleSignOut} />
+                <HomeMdw></HomeMdw>
               </Route>
+
+              <Route path="/" exact={true}>
+                <HomeMdw></HomeMdw>
+              </Route>
+
               <Route path="/">
-                <HomePage onSignOut={this.handleSignOut} />
+                <div>404 page: resources not found2</div>
               </Route>
+
             </Switch>
+
           </div>
-        </Router> */}
-        {
+        </Router>
+
+
+        {/* {
           this.state.isSignedIn ?
             <HomePage onSignOut={this.handleSignOut} />
             : <LoginPage onDoneSignIn={this.handleToken} />
-        }
+        } */}
       </div>
     );
   }
